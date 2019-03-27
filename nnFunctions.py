@@ -60,10 +60,20 @@ def sigmoid(z):
     return the sigmoid of input z (same dimensions as z)
     '''
     # your code here - remove the next four lines
+    #if its a scalar then just do sigmoid activation
+    #else iterate through the matrix and do sigmoid activation on each element and store them in s
     if np.isscalar(z):
-        s = 0
+        s = 1 / (1 + exp(-1 * z))
     else:
         s = np.zeros(z.shape)
+        for ix, iy in np.ndindex(z.shape):
+            temp = z[ix,iy]
+            sigmoid_result = 1 / (1 + exp(-1 * temp))
+            print(str(sigmoid_result))
+            s[ix,iy] = sigmoid_result
+
+
+
     return s
 
 def nnObjFunction(params, *args):

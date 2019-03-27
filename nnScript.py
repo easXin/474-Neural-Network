@@ -3,8 +3,8 @@ Neural Network Script Starts here
 '''
 from nnFunctions import *
 # you may experiment with a small data set (mnist_sample.pickle) first
-filename = '../basecode/mnist_all.pickle'
-#filename = 'AI_quick_draw.pickle'
+#filename = '../basecode/mnist_all.pickle'
+filename = 'AI_quick_draw.pickle'
 train_data, train_label, test_data, test_label = preprocess(filename)
 
 #  Train Neural Network
@@ -48,3 +48,6 @@ print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_
 # find the accuracy on Testing Dataset
 predicted_label = nnPredict(W1, W2, test_data)
 print('\n Test set Accuracy:    ' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+
+a = np.arange(0,60,5)
+a = a.reshape(3,4)
