@@ -111,24 +111,15 @@ def nnObjFunction(params, *args):
     W1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
     W2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
     obj_val = 0
-
-    # Your code here
-    #
-    #
-    #
-    #
-    #
-
-
-
-    # Make sure you reshape the gradient matrices to a 1D array. for instance if
-    # your gradient matrices are grad_W1 and grad_W2
-    # you would use code similar to the one below to create a flat array
-    # obj_grad = np.concatenate((grad_W1.flatten(), grad_W2.flatten()),0)
-    obj_grad = np.zeros(params.shape)
-
-    return (obj_val, obj_grad)
-
+	training_data = np.column_stack((train_data, np.ones(train_data.shape[0])))
+    tempOldDa = sigmoid(np.dot(np.column_stack((sigmoid(np.dot(training_data, W1.T)), np.ones(sigmoid(np.dot(training_data, W1.T)).shape[0]))), W2.T))
+   	t1 = tempOldDa - train_label
+    g2 = np.dot(t1.T, np.column_stack((sigmoid(np.dot(training_data, W1.T)), np.ones(sigmoid(np.dot(training_data, W1.T)).shape[0]))))
+    g1 = np.dot(((1 - np.column_stack((sigmoid(np.dot(training_data, W1.T)), np.ones(sigmoid(np.dot(training_data, W1.T)).shape[0])))) * np.column_stack((sigmoid(np.dot(training_data, W1.T)), np.ones(sigmoid(np.dot(training_data, W1.T)).shape[0]))) * (np.dot(delta_l, W2))).T, training_data)
+    g1 = np.delete(g1, n_hidden, 0)
+    obj_grad = np.array([]).concatenate((g1.flatten(), g2.flatten()), 0) / training_data.shape[0] 
+    obj_val= (np.sum(-1 * (train_label * np.log(tempOldDa) + (1 - train_label) * np.log(1 - tempOldDa))) / training_data.shape[0])+((lambdaval / (2 * training_data.shape[0])) * (np.sum(np.square(W1)) + np.sum(np.square(W2))))
+    return (obj_val, np.zeros(t0))
 
 def nnPredict(W1, W2, data):
     '''
