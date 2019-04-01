@@ -106,18 +106,44 @@ def nnObjFunction(params, *args):
     % for each weights in weight matrices.
     '''
     n_input, n_hidden, n_class, train_data, train_label, lambdaval = args
-    W1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
-    W2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
+
+    w1 = params[0:n_hidden * (n_input + 1)].reshape((n_hidden, (n_input + 1)))
+    w2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
     obj_val = 0
-    ntrain_data = np.column_stack((train_data, np.ones(train_data.shape[0])))
-    t1 = sigmoid(np.dot(np.column_stack((sigmoid(np.dot(ntrain_data, W1.T)), np.ones(sigmoid(np.dot(ntrain_data, W1.T)).shape[0]))), W2.T))
-    t1 = t1 - train_label
-    g2 = np.dot(t1.T, np.column_stack((sigmoid(np.dot(ntrain_data, W1.T)), np.ones(sigmoid(np.dot(ntrain_data, W1.T)).shape[0]))))
-    g1 = np.dot(((1 - np.column_stack((sigmoid(np.dot(ntrain_data, W1.T)), np.ones(sigmoid(np.dot(ntrain_data, W1.T)).shape[0])))) * np.column_stack((sigmoid(np.dot(ntrain_data, W1.T)), np.ones(sigmoid(np.dot(ntrain_data, W1.T)).shape[0]))) * (np.dot(delta_l, W2))).T, ntrain_data)
-    g1 = np.delete(g1, n_hidden, 0)
-    obj_grad = np.array([]).concatenate((g1.flatten(), g2.flatten()), 0) / ntrain_data.shape[0] 
-    obj_val= (np.sum(-1 * (train_label * np.log(t1) + (1 - train_label) * np.log(1 - t1))) / ntrain_data.shape[0])+((lambdaval / (2 * ntrain_data.shape[0])) * (np.sum(np.square(W1)) + np.sum(np.square(W2))))
-    return (obj_val, np.zeros(t0))
+
+# ==================================================================================
+    # sort the data horizontally
+    shape1 = np.ones(train_data.shape[0])
+    training_data = np.column_stack((train_data, shape1))
+    # Hidden layer Output
+    hiddenLayerO = sigmoid(np.matmul(training_data,w1.T))
+    # create space and fill in the data
+    shape2 = np.ones(training_data.shape[0])
+    hiddenLayer1 = np.column_stack((hiddenLayerO, shape2))
+    # matrix mul   x * 2    2 *  y     => x * y
+    # Hidden layer Output
+    hiddenLayer2 = sigmoid(np.matmul(hiddenLayer1,w2.T))
+    # Return a new array of given shape and type, filled with zeros.
+    outclass = np.zeros(np.shape(hiddenLayer2)) # size : output_2
+    i = 0
+    while i < len(outclass):
+        for j in range(np.shape(outclass)[1]):
+            if j == int(training_label[i]):
+                outclass[i][j] = 1
+        i+=1
+    # compute 5th equation
+    obj_val = (-1 / len(training_data)) * np.sum(np.add(outclass * np.log(hiddenLayer2), (1 - outclass) * np.log(1 - hiddenLayer2)))
+    # -------------------------------------------------------
+    # Calculate Gradient
+    delta = hiddenLayer2 - outclass
+
+    # Delete the zero row
+    gradient1 = np.delete(np.dot(((1 - hiddenLayer1) * hiddenLayer1 * (np.dot(delta, w2))).T, training_data), n_hidden,0)
+    gradient2 = np.matmul(delta.T, hiddenLayer1)
+    #   ===========================================================================================
+
+    obj_grad = np.concatenate((gradient1.flatten(), gradient2.flatten()), 0)
+    return (obj_val, obj_grad)
 
 def nnPredict(W1, W2, data):
     '''
