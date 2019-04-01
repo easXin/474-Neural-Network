@@ -136,5 +136,8 @@ def nnPredict(W1, W2, data):
 
     labels = np.zeros((data.shape[0],))
     # Your code here
+    
+    vectOfOnes = np.ones(len(data),1) #vertical vector of ones with same number of rows as data
+    data = np.c[data, vectOfOnes]#combines data with the vector; vector is now a column of data
 
     return labels
