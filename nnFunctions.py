@@ -63,13 +63,12 @@ def sigmoid(z):
     #if its a scalar then just do sigmoid activation
     #else iterate through the matrix and do sigmoid activation on each element and store them in s
     if np.isscalar(z):
-        s = 1 / (1 + exp(-1 * z))
+        s = 1 / (1 + np.exp(-1 * z))
     else:
         s = np.zeros(z.shape)
         for ix, iy in np.ndindex(z.shape):
             temp = z[ix,iy]
-            sigmoid_result = 1 / (1 + exp(-1 * temp))
-            print(str(sigmoid_result))
+            sigmoid_result = 1 / (1 + np.exp(-1 * temp))
             s[ix,iy] = sigmoid_result
 
 
@@ -128,7 +127,7 @@ def nnObjFunction(params, *args):
     i = 0
     while i < len(outclass):
         for j in range(np.shape(outclass)[1]):
-            if j == int(training_label[i]):
+            if j == int(train_label[i]):
                 outclass[i][j] = 1
         i+=1
     # compute 5th equation

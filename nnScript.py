@@ -49,5 +49,3 @@ print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_
 predicted_label = nnPredict(W1, W2, test_data)
 print('\n Test set Accuracy:    ' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
 
-a = np.arange(0,60,5)
-a = a.reshape(3,4)
