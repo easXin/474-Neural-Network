@@ -140,15 +140,14 @@ def nnPredict(W1, W2, data):
     vectOfOnes = np.ones(len(data),1) #vertical vector of ones with same number of rows as data
     data = np.c[data, vectOfOnes]#combines data with the vector; vector is now a column of data
     
-    np.transpose(W1)
-    dotProduct1 = np.dot(data,W1)#multiplies data with a transposed W1
+    dotProduct1 = np.dot(W1,data)#W * x;messed up before didnt need to transpose
     outputLayer1 = sigmoid(dotProduct1)#computes sigmoid of each output
     
     #now for W2; basically pretty much the same thing
     vectOfOnes = np.ones(len(outputLayer1),1)#vertical vector of ones with same number of rows as the first output layer
     outputLayer1 = np.c[outputLayer1, vectOfOnes]
-    np.transpose(W2)
-    dotProduct2 = np.dot(data,W2)
+    
+    dotProduct2 = np.dot(W2,data)#W * x
     outputLayer2 = sigmoid(dotProduct2)
     
     labels = np.argmax(outputLayer2, axis=1)
