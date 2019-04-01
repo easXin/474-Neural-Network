@@ -139,5 +139,8 @@ def nnPredict(W1, W2, data):
     
     vectOfOnes = np.ones(len(data),1) #vertical vector of ones with same number of rows as data
     data = np.c[data, vectOfOnes]#combines data with the vector; vector is now a column of data
+    
+    np.transpose(W1)
+    dotProduct = data.dot(W1)#multiplies data with a transposed W1
 
     return labels
