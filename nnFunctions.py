@@ -191,20 +191,21 @@ def nnPredict(W1, W2, data):
 
     labels = np.zeros((data.shape[0],))
     # Your code here
-    
-    vectOfOnes = np.ones(len(data),1) #vertical vector of ones with same number of rows as data
-    data = np.c[data, vectOfOnes]#combines data with the vector; vector is now a column of data
-    
-    dotProduct1 = np.dot(W1,data)#W * x;messed up before didnt need to transpose
-    outputLayer1 = sigmoid(dotProduct1)#computes sigmoid of each output
-    
-    #now for W2; basically pretty much the same thing
-    vectOfOnes = np.ones(len(outputLayer1),1)#vertical vector of ones with same number of rows as the first output layer
-    outputLayer1 = np.c[outputLayer1, vectOfOnes]
-    
-    dotProduct2 = np.dot(W2,data)#W * x
+
+    vectOfOnes = np.ones(len(data))  # vertical vector of ones with same number of rows as data
+    data = np.column_stack((data, vectOfOnes))  # combines data with the vector; vector is now a column of data
+
+    dotProduct1 = np.dot(data, W1.T)  # W * x;messed up before didnt need to transpose
+    outputLayer1 = sigmoid(dotProduct1)  # computes sigmoid of each output
+
+    # now for W2; basically pretty much the same thing
+    vectOfOnes = np.ones(len(outputLayer1))  # vertical vector of ones with same number of rows as the first output layer
+    outputLayer1 = np.column_stack((outputLayer1, vectOfOnes))
+
+    dotProduct2 = np.dot(outputLayer1,W2.T)  # W * x
     outputLayer2 = sigmoid(dotProduct2)
-    
+
     labels = np.argmax(outputLayer2, axis=1)
 
     return labels
+
