@@ -110,36 +110,66 @@ def nnObjFunction(params, *args):
     w2 = params[(n_hidden * (n_input + 1)):].reshape((n_class, (n_hidden + 1)))
     obj_val = 0
 
-# ==================================================================================
-    # sort the data horizontally
-    shape1 = np.ones(train_data.shape[0])
-    training_data = np.column_stack((train_data, shape1))
-    # Hidden layer Output
-    hiddenLayerO = sigmoid(np.matmul(training_data,w1.T))
-    # create space and fill in the data
-    shape2 = np.ones(training_data.shape[0])
-    hiddenLayer1 = np.column_stack((hiddenLayerO, shape2))
-    # matrix mul   x * 2    2 *  y     => x * y
-    # Hidden layer Output
-    hiddenLayer2 = sigmoid(np.matmul(hiddenLayer1,w2.T))
-    # Return a new array of given shape and type, filled with zeros.
-    outclass = np.zeros(np.shape(hiddenLayer2)) # size : output_2
+    #creating a column for the bias terms and inserting at the end
+    N = train_data.shape[0]
+    hidden_bias = np.ones(N)
+    train_data = np.column_stack((train_data, hidden_bias))
+
+    #foward pass to hidden layer
+    hiddenlayer_output = sigmoid(np.matmul(train_data, w1.T))
+
+    #same process as above excpet its from hidden -> output
+    output_bias = np.ones(hiddenlayer_output.shape[0])
+    hiddenlayer_output = np.column_stack((hiddenlayer_output, output_bias))
+    outputlayer_output = sigmoid(np.matmul(hiddenlayer_output, w2.T))
+
+    #stores the encoding of the output
+    outclass = np.zeros(np.shape(outputlayer_output))
     i = 0
+
+    #computes the 1 of k encoding
     while i < len(outclass):
         for j in range(np.shape(outclass)[1]):
             if j == int(train_label[i]):
                 outclass[i][j] = 1
-        i+=1
-    # compute 5th equation
-    obj_val = (-1 / len(training_data)) * np.sum(np.add(outclass * np.log(hiddenLayer2), (1 - outclass) * np.log(1 - hiddenLayer2)))
-    # -------------------------------------------------------
-    # Calculate Gradient
-    delta = hiddenLayer2 - outclass
+        i += 1
+    # compute the error function
+    obj_val = (-1 / len(train_data)) * np.sum(np.add(outclass * np.log(outputlayer_output), (1 - outclass) * np.log(1 - outputlayer_output)))
 
-    # Delete the zero row
-    gradient1 = np.delete(np.dot(((1 - hiddenLayer1) * hiddenLayer1 * (np.dot(delta, w2))).T, training_data), n_hidden,0)
-    gradient2 = np.matmul(delta.T, hiddenLayer1)
-    #   ===========================================================================================
+    #regularize the data using equation 15
+    outside_constant = lambdaval / (2 * N)
+    first_summation = np.sum(np.square(w1), axis=1)
+    second_summation = np.sum(np.square(w2), axis=1)
+    result = np.sum(first_summation,axis=0) + np.sum(second_summation, axis=0)
+    obj_val = obj_val + (outside_constant * result)
+
+    # Calculate Gradient
+    delta = np.subtract(outputlayer_output,outclass)
+    delta_transpose = delta.transpose()
+
+    #initializing the gradient weights
+    gradient1 = np.zeros(w1.shape)
+    gradient2 = np.zeros(w2.shape)
+
+
+    #calculate gradient for hidden -> output weights
+    gradient2 = (1/N) * np.dot(delta_transpose, hiddenlayer_output)
+    constant_term = (lambdaval * w2) / N
+    gradient2 = gradient2 + constant_term
+
+    #calculate the gradient for input -> hidden weights
+
+    multiplying_term = np.subtract(1,hiddenlayer_output)
+    multiplying_term = np.multiply(multiplying_term,hiddenlayer_output)
+    hidden_delta = np.dot(delta,w2)
+    multiplying_term = multiplying_term * hidden_delta
+    multiplying_term_transpose = multiplying_term.transpose()
+
+    gradient1 = (1/N) * np.dot(multiplying_term_transpose,train_data)
+    constant_term = (lambdaval * w1) / N
+
+    gradient1= np.delete(gradient1,n_hidden,0)
+    gradient1 = gradient1 + constant_term
 
     obj_grad = np.concatenate((gradient1.flatten(), gradient2.flatten()), 0)
     return (obj_val, obj_grad)
