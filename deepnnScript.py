@@ -7,6 +7,20 @@ import pickle
 import os
 #os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
+
+'''
+3 layers -> h1 h2 out
+5 layers -> h1 h2 h3 h4 out
+7 layers -> h1 h2 h3 h4 h5 h6 out
+
+
+'''
+
+
+
+
+
+
 # Preparing the data set
 with open('AI_quick_draw.pickle', 'rb') as open_ai_quick:
     data_train = pickle.load(open_ai_quick)
@@ -35,6 +49,13 @@ training_iteration_num = 3000
 
 n_hidden_1 = 256  # 1st layer number of neurons
 n_hidden_2 = 256  # 2nd layer number of neurons
+
+#Added 4 more layers
+n_hidden_3 = 256 
+n_hidden_4 = 256 
+n_hidden_5 = 256  
+n_hidden_6 = 256  
+
 n_input = data_train.shape[1]  # MNIST data input (img shape: 28*28)
 n_classes = label_train.shape[1]  # MNIST total classes (0-9 digits)
 dropout = 0.5
@@ -45,13 +66,40 @@ Y = tf.placeholder("float", [None, n_classes])
 
 # Store layers weight & bias
 weights = {
+    #3 layers
     'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
     'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
+
+    #Changes: uncomment below for 5 layers and comment out the top 3 layers----------------------------------------------------------------------------------------------------
+    # 'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
+    # 'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+    # 'h3': tf.Variable(tf.random_normal([n_hidden_2, n_hidden_3])),
+    # 'h4': tf.Variable(tf.random_normal([n_hidden_3, n_hidden_4])),
+    # 'out': tf.Variable(tf.random_normal([n_hidden_4, n_classes]))
+    
+    #Changes: uncomment below for 7 layers
+    # 'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
+    # 'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+    # 'h3': tf.Variable(tf.random_normal([n_hidden_2, n_hidden_3])),
+    # 'h4': tf.Variable(tf.random_normal([n_hidden_3, n_hidden_4])),
+    # 'h5': tf.Variable(tf.random_normal([n_hidden_4, n_hidden_5])),
+    # 'h6': tf.Variable(tf.random_normal([n_hidden_5, n_hidden_6])),
+    # 'out': tf.Variable(tf.random_normal([n_hidden_6, n_classes]))
+
+
+    
 }
 biases = {
     'b1': tf.Variable(tf.random_normal([n_hidden_1])),
     'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+
+    #Changes: uncomment b3 and b4 for 5 layers and uncomment the rest for 7--------------------------------------------------------------------------------------------
+    # 'b3': tf.Variable(tf.random_normal([n_hidden_3])),
+    # 'b4': tf.Variable(tf.random_normal([n_hidden_4])),
+    # 'b5': tf.Variable(tf.random_normal([n_hidden_5])),
+    # 'b6': tf.Variable(tf.random_normal([n_hidden_6])),
+
     'out': tf.Variable(tf.random_normal([n_classes]))
 }
 
@@ -68,6 +116,48 @@ def multilayer_perceptron(x):
 
     # Output fully connected layer with a neuron for each class
     out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+
+
+    #Changes: 5 layers------------------------------------------------------------------------------------------------------------
+    # layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
+    # layer_1 = tf.nn.sigmoid(layer_1)
+
+    # layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
+    # layer_2 = tf.nn.sigmoid(layer_2)
+
+    # layer_3 = tf.add(tf.matmul(x, weights['h3']), biases['b3'])
+    # layer_3 = tf.nn.sigmoid(layer_3)
+
+    # layer_4 = tf.add(tf.matmul(layer_1, weights['h4']), biases['b4'])
+    # layer_4 = tf.nn.sigmoid(layer_4)
+
+    # out_layer = tf.matmul(layer_4, weights['out']) + biases['out']
+
+
+
+    #Changes: 7 layers------------------------------------------------------------------------------------------------------------
+    # layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
+    # layer_1 = tf.nn.sigmoid(layer_1)
+
+    # layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
+    # layer_2 = tf.nn.sigmoid(layer_2)
+
+    # layer_3 = tf.add(tf.matmul(x, weights['h3']), biases['b3'])
+    # layer_3 = tf.nn.sigmoid(layer_3)
+
+    # layer_4 = tf.add(tf.matmul(layer_1, weights['h4']), biases['b4'])
+    # layer_4 = tf.nn.sigmoid(layer_4)
+
+    # layer_5 = tf.add(tf.matmul(x, weights['h5']), biases['b5'])
+    # layer_5 = tf.nn.sigmoid(layer_5)
+
+    # layer_6 = tf.add(tf.matmul(layer_1, weights['h6']), biases['b6'])
+    # layer_6 = tf.nn.sigmoid(layer_6)
+
+    # out_layer = tf.matmul(layer_6, weights['out']) + biases['out']
+
+
+
     return out_layer
 
 
